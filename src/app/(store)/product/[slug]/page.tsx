@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { products } from "@/data/products";
 import { ProductDetailClient } from "@/components/products/ProductDetailClient";
 import { brandConfig } from "@/config/brand.config";
@@ -25,7 +24,9 @@ export async function generateMetadata({ params }: PageProps<"/product/[slug]">)
 
 export default async function ProductPage({ params }: PageProps<"/product/[slug]">) {
   const { slug } = await params;
-  const product = products.find((p) => p.slug === slug && p.isActive);
-  if (!product) notFound();
+  // The client component resolves the product from the live catalog (which may
+  // include admin-added products persisted in the browser) and renders a
+  // "not found" state for unknown slugs.
+  void slug;
   return <ProductDetailClient />;
 }

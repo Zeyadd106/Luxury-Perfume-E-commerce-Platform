@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ButtonLink } from "@/components/ui/Button";
 import { afterMount } from "@/lib/utils";
+import { useLang } from "@/lib/i18n/provider";
 import type { Product } from "@/types";
 
 const WISHLIST_KEY = "atelier-wishlist-v1";
@@ -23,6 +24,7 @@ function WishlistCard({ slug }: { slug: string }) {
 }
 
 export function WishlistClient() {
+  const { t } = useLang();
   const [items, setItems] = useState<WishlistItem[] | null>(null);
 
   useEffect(
@@ -39,7 +41,7 @@ export function WishlistClient() {
 
   return (
     <div>
-      <h1 className="font-serif text-4xl font-light">Wishlist</h1>
+      <h1 className="font-serif text-4xl font-light">{t.account.wishlist}</h1>
       {items === null ? (
         <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -49,10 +51,10 @@ export function WishlistClient() {
       ) : items.length === 0 ? (
         <div className="mt-10 flex max-w-md flex-col items-center border border-dashed hairline p-10 text-center">
           <Heart size={32} strokeWidth={1} className="mb-4 text-muted" />
-          <p className="font-serif text-2xl font-light">Nothing saved yet</p>
-          <p className="mt-2 text-sm font-light text-muted">Tap the heart on any fragrance to keep it here.</p>
+          <p className="font-serif text-2xl font-light">{t.account.wishlistEmpty}</p>
+          <p className="mt-2 text-sm font-light text-muted">{t.account.wishlistEmptyHint}</p>
           <div className="mt-8">
-            <ButtonLink href="/shop" variant="outline" size="sm">Discover Fragrances</ButtonLink>
+            <ButtonLink href="/shop" variant="outline" size="sm">{t.account.discoverFragrances}</ButtonLink>
           </div>
         </div>
       ) : (
@@ -64,7 +66,7 @@ export function WishlistClient() {
       )}
       {items && items.length > 0 && (
         <p className="mt-8 text-xs font-light text-muted">
-          Wishlist is stored in your browser. <Link href="/shop" className="underline underline-offset-4 hover:text-accent">Continue shopping</Link>.
+          {t.account.wishlistNote} <Link href="/shop" className="underline underline-offset-4 hover:text-accent">{t.account.continueShopping}</Link>.
         </p>
       )}
     </div>

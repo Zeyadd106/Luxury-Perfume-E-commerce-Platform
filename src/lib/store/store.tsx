@@ -198,24 +198,34 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quickViewSlug, setQuickViewSlug] = useState<string | null>(null);
 
+  const openCart = useCallback(() => setCartOpen(true), []);
+  const closeCart = useCallback(() => setCartOpen(false), []);
+  const openSearch = useCallback(() => setSearchOpen(true), []);
+  const closeSearch = useCallback(() => setSearchOpen(false), []);
+  const toggleSearch = useCallback(() => setSearchOpen((v) => !v), []);
+  const openMobileMenu = useCallback(() => setMobileMenuOpen(true), []);
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
+  const toggleMobileMenu = useCallback(() => setMobileMenuOpen((v) => !v), []);
+  const closeQuickView = useCallback(() => setQuickViewSlug(null), []);
+
   const value = useMemo<UIContextValue>(
     () => ({
       cartOpen,
       searchOpen,
       mobileMenuOpen,
       quickViewSlug,
-      openCart: () => setCartOpen(true),
-      closeCart: () => setCartOpen(false),
-      openSearch: () => setSearchOpen(true),
-      closeSearch: () => setSearchOpen(false),
-      toggleSearch: () => setSearchOpen((v) => !v),
-      openMobileMenu: () => setMobileMenuOpen(true),
-      closeMobileMenu: () => setMobileMenuOpen(false),
-      toggleMobileMenu: () => setMobileMenuOpen((v) => !v),
+      openCart,
+      closeCart,
+      openSearch,
+      closeSearch,
+      toggleSearch,
+      openMobileMenu,
+      closeMobileMenu,
+      toggleMobileMenu,
       openQuickView: setQuickViewSlug,
-      closeQuickView: () => setQuickViewSlug(null),
+      closeQuickView,
     }),
-    [cartOpen, searchOpen, mobileMenuOpen, quickViewSlug]
+    [cartOpen, searchOpen, mobileMenuOpen, quickViewSlug, openCart, closeCart, openSearch, closeSearch, toggleSearch, openMobileMenu, closeMobileMenu, toggleMobileMenu, closeQuickView]
   );
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;

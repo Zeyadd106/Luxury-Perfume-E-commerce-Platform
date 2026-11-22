@@ -6,10 +6,12 @@ import { Heart, ShoppingBag, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useProduct } from "@/lib/query/hooks";
 import { useCart, useToast, useUI, useWishlist } from "@/lib/store/store";
+import { useRequireAuth } from "@/lib/auth";
 import { formatPrice } from "@/lib/utils";
 import { Rating } from "@/components/ui/Rating";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { cn } from "@/lib/utils";
+import { useLang } from "@/lib/i18n/provider";
 
 export function QuickViewModal() {
   const { quickViewSlug, closeQuickView } = useUI();
@@ -17,6 +19,8 @@ export function QuickViewModal() {
   const { addItem } = useCart();
   const { has, toggle } = useWishlist();
   const { push } = useToast();
+  const requireAuth = useRequireAuth();
+  const { t } = useLang();
   const [sizeMl, setSizeMl] = useState<number | null>(null);
 
   const [prevProduct, setPrevProduct] = useState(product);
@@ -38,13 +42,13 @@ export function QuickViewModal() {
   const wished = product ? has(product.id) : false;
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 sm:p-8" role="dialog" aria-modal="true" aria-label="Quick view">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 sm:p-8" role="dialog" aria-modal="true" aria-label={t.shop.quickView}>
       <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={closeQuickView} />
       <div className="relative grid max-h-[90vh] w-full max-w-4xl grid-cols-1 overflow-y-auto bg-ivory md:grid-cols-2">
         <button
           onClick={closeQuickView}
-          className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center bg-ivory/80 backdrop-blur transition-colors hover:text-accent"
-          aria-label="Close quick view"
+          className="absolute end-4 top-4 z-10 flex h-10 w-10 items-center justify-center bg-ivory/80 backdrop-blur transition-colors hover:text-accent"
+          aria-label={t.nav.close}
         >
           <X size={18} />
         </button>
@@ -73,7 +77,7 @@ export function QuickViewModal() {
               <p className="mt-4 text-sm font-light leading-relaxed text-ink/70">{product.shortDescription}</p>
 
               <div className="mt-4">
-                <p className="eyebrow mb-2 text-muted">Size</p>
+                <p className="eyebrow mb-2 text-muted">{t.product.size}</p>
                 <div className="flex flex-wrap gap-2">
                   {product.sizes.map((s) => (
                     <button
@@ -82,7 +86,7 @@ export function QuickViewModal() {
                       disabled={!s.inStock}
                       className={cn(
                         "border px-4 py-2 text-xs tracking-wide transition-colors disabled:opacity-40",
-                        sizeMl === s.ml ? "border-ink bg-ink text-ivory" : "hairline hover:border-ink"
+                        sizeMl === s.ml ? "border-ink bg-ink text-ivory" : "hairline hover:border-ivory"
                       )}
                     >
                       {s.ml} ml · {formatPrice(s.price)}
@@ -103,6 +107,7 @@ export function QuickViewModal() {
                   disabled={!selected?.inStock}
                   onClick={() => {
                     if (!selected) return;
+                    if (!requireAuth(`add ${product.name} to your bag`)) return;
                     addItem(
                       {
                         productId: product.id,
@@ -114,39 +119,39 @@ export function QuickViewModal() {
                       },
                       1
                     );
-                    push(`${product.name} added to your bag`);
+                    push(t.product.addedToBag.replace("{name}", product.name));
                     closeQuickView();
                   }}
                   className="flex items-center justify-center gap-2 bg-ink py-4 text-[0.75rem] font-medium uppercase tracking-[0.24em] text-ivory transition-colors hover:bg-accent hover:text-ink disabled:opacity-50"
                 >
-                  <ShoppingBag size={15} /> Add to Bag
+                  <ShoppingBag size={15} /> {t.product.addToBag}
                 </button>
                 <div className="flex gap-3">
                   <button
                     onClick={() => {
                       toggle({ productId: product.id, slug: product.slug, addedAt: new Date().toISOString() });
-                      push(wished ? "Removed from wishlist" : "Saved to wishlist", "info");
+                      push(wished ? t.product.wishlistRemoved : t.product.wishlistSaved, "info");
                     }}
                     className={cn(
                       "flex flex-1 items-center justify-center gap-2 border py-3 text-[0.6875rem] uppercase tracking-[0.2em] transition-colors",
-                      wished ? "border-accent bg-accent/10 text-accent" : "hairline hover:border-ink"
+                      wished ? "border-accent bg-accent/10 text-accent" : "hairline hover:border-ivory"
                     )}
                   >
-                    <Heart size={14} fill={wished ? "currentColor" : "none"} /> {wished ? "Saved" : "Wishlist"}
+                    <Heart size={14} fill={wished ? "currentColor" : "none"} /> {wished ? t.product.savedLabel : t.shop.wishlist}
                   </button>
                   <Link
                     href={`/product/${product.slug}`}
                     onClick={closeQuickView}
-                    className="flex flex-1 items-center justify-center border hairline py-3 text-[0.6875rem] uppercase tracking-[0.2em] transition-colors hover:border-ink"
+                    className="flex flex-1 items-center justify-center border hairline py-3 text-[0.6875rem] uppercase tracking-[0.2em] transition-colors hover:border-ivory"
                   >
-                    Full Details
+                    {t.product.fullDetails}
                   </Link>
                 </div>
               </div>
 
               <div className="mt-6 border-t hairline pt-4">
                 <p className="text-xs font-light text-muted">
-                  Top: {product.topNotes.join(", ")} · Heart: {product.heartNotes.join(", ")}
+                  {t.product.topHeart}: {product.topNotes.join(", ")} · {t.product.heartLabel}: {product.heartNotes.join(", ")}
                 </p>
               </div>
             </>

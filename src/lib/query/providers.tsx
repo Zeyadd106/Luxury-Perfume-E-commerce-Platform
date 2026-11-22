@@ -1,7 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect, type ReactNode } from "react";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { subscribeCatalog } from "@/lib/catalog";
 
 function makeClient() {
   return new QueryClient({
@@ -27,6 +28,24 @@ function getClient() {
   return browserClient;
 }
 
+/** Refetches every query whenever the product catalog changes (admin edits). */
+function CatalogSync() {
+  const queryClient = useQueryClient();
+  useEffect(
+    () =>
+      subscribeCatalog(() => {
+        void queryClient.invalidateQueries();
+      }),
+    [queryClient]
+  );
+  return null;
+}
+
 export function Providers({ children }: { children: ReactNode }) {
-  return <QueryClientProvider client={getClient()}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={getClient()}>
+      <CatalogSync />
+      {children}
+    </QueryClientProvider>
+  );
 }

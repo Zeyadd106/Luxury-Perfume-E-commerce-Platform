@@ -7,8 +7,10 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useCart, useFreeShippingProgress, useUI } from "@/lib/store/store";
 import { formatPrice } from "@/lib/utils";
+import { useLang } from "@/lib/i18n/provider";
 
 export function CartDrawer() {
+  const { t, dir } = useLang();
   const { cartOpen, closeCart } = useUI();
   const { items, subtotal, updateQuantity, removeItem } = useCart();
   const { threshold, remaining, eligible } = useFreeShippingProgress();
@@ -22,7 +24,7 @@ export function CartDrawer() {
         { opacity: 0, x: 24 },
         { opacity: 1, x: 0, duration: 0.45, stagger: 0.06, delay: 0.25, ease: "power3.out" }
       );
-    }, drawerRef);
+    }, drawerRef.current);
     return () => ctx.revert();
   }, [cartOpen]);
 
@@ -45,13 +47,13 @@ export function CartDrawer() {
       />
       <div
         ref={drawerRef}
-        className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-ivory text-ink shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${cartOpen ? "translate-x-0" : "translate-x-full"}`}
+        className={`absolute end-0 top-0 flex h-full w-full max-w-md flex-col bg-ivory text-ink shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${cartOpen ? "translate-x-0" : dir === "rtl" ? "-translate-x-full" : "translate-x-full"}`}
         role="dialog"
         aria-modal="true"
         aria-label="Shopping bag"
       >
         <div className="flex items-center justify-between border-b hairline px-6 py-5">
-          <h2 className="font-serif text-xl">Your Bag {items.length > 0 && `(${items.reduce((n, i) => n + i.quantity, 0)})`}</h2>
+          <h2 className="font-serif text-xl">{t.cart.title} {items.length > 0 && `(${items.reduce((n, i) => n + i.quantity, 0)})`}</h2>
           <button onClick={closeCart} className="flex h-9 w-9 items-center justify-center hover:text-accent" aria-label="Close bag">
             <X size={20} strokeWidth={1.5} />
           </button>
@@ -62,9 +64,9 @@ export function CartDrawer() {
           <div className="border-b hairline px-6 py-4">
             <p className="mb-2 text-xs font-light text-muted">
               {eligible ? (
-                <span className="text-accent">You qualify for complimentary shipping.</span>
+                <span className="text-accent">{t.cart.freeShipping}</span>
               ) : (
-                <>Add {formatPrice(remaining)} for complimentary shipping</>
+                <>{t.cart.awayFromFree}: {formatPrice(remaining)}</>
               )}
             </p>
             <div className="h-px w-full bg-ink/15">
@@ -77,16 +79,16 @@ export function CartDrawer() {
           {items.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <ShoppingBag size={40} strokeWidth={1} className="mb-5 text-muted" />
-              <p className="font-serif text-2xl font-light">Your bag is empty</p>
+              <p className="font-serif text-2xl font-light">{t.cart.empty}</p>
               <p className="mt-2 max-w-xs text-sm font-light text-muted">
-                Discover compositions crafted to linger.
+                {t.cart.emptyHint}
               </p>
               <Link
                 href="/shop"
                 onClick={closeCart}
                 className="eyebrow mt-8 border border-ink px-8 py-3 hover:bg-ink hover:text-ivory transition-colors"
               >
-                Explore the Collection
+                {t.hero.primaryCta}
               </Link>
             </div>
           ) : (
@@ -116,7 +118,7 @@ export function CartDrawer() {
                       <div className="flex items-center border hairline">
                         <button
                           onClick={() => updateQuantity(item.productId, item.sizeMl, item.quantity - 1)}
-                          className="flex h-8 w-8 items-center justify-center hover:bg-ink/5"
+                          className="flex h-8 w-8 items-center justify-center hover:bg-ivory/10"
                           aria-label="Decrease quantity"
                         >
                           <Minus size={12} />
@@ -124,7 +126,7 @@ export function CartDrawer() {
                         <span className="w-8 text-center text-sm">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.productId, item.sizeMl, item.quantity + 1)}
-                          className="flex h-8 w-8 items-center justify-center hover:bg-ink/5"
+                          className="flex h-8 w-8 items-center justify-center hover:bg-ivory/10"
                           aria-label="Increase quantity"
                         >
                           <Plus size={12} />
@@ -142,26 +144,26 @@ export function CartDrawer() {
         {items.length > 0 && (
           <div className="border-t hairline px-6 py-5">
             <div className="mb-1 flex justify-between text-sm font-light">
-              <span className="text-muted">Subtotal</span>
+              <span className="text-muted">{t.cart.subtotal}</span>
               <span>{formatPrice(subtotal)}</span>
             </div>
             <div className="mb-4 flex justify-between text-sm font-light">
-              <span className="text-muted">Shipping</span>
-              <span>{eligible ? "Complimentary" : "Calculated at checkout"}</span>
+              <span className="text-muted">{t.cart.shipping}</span>
+              <span>{eligible ? "—" : "—"}</span>
             </div>
             <Link
               href="/checkout"
               onClick={closeCart}
               className="flex w-full items-center justify-center gap-2 bg-ink py-4 text-[0.75rem] font-medium uppercase tracking-[0.24em] text-ivory transition-colors hover:bg-accent hover:text-ink"
             >
-              Proceed to Checkout <ArrowRight size={14} />
+              {t.cart.checkout} <ArrowRight size={14} />
             </Link>
             <Link
               href="/cart"
               onClick={closeCart}
-              className="mt-3 block text-center text-xs font-light uppercase tracking-[0.2em] text-muted hover:text-ink"
+              className="mt-3 block text-center text-xs font-light uppercase tracking-[0.2em] text-muted hover:text-ivory"
             >
-              View full bag
+              {t.cart.title}
             </Link>
           </div>
         )}

@@ -72,7 +72,7 @@ export interface BrandConfig {
 }
 
 export const brandConfig: BrandConfig = {
-  name: "ATELIER PARFUM",
+  name: "ZEIN",
   tagline: "The Art of Lasting Impressions",
   description:
     "A modern haute parfumerie house crafting timeless eaux de parfum with rare ingredients and uncompromising craftsmanship.",
@@ -80,14 +80,14 @@ export const brandConfig: BrandConfig = {
   locale: "en-US",
   founded: 1998,
   theme: {
-    ink: "#15130f",
+    ink: "#0c0c0c",
     ivory: "#f4efe4",
-    accent: "#c6a46c",
-    muted: "#8f8674",
+    accent: "#facc15",
+    muted: "#a89f8d",
     line: "#ddd3c0",
   },
-  logoText: "ATELIER",
-  faviconInitial: "A",
+  logoText: "ZEIN",
+  faviconInitial: "Z",
   navigation: [
     { label: "Home", href: "/" },
     { label: "Shop", href: "/shop" },
@@ -122,7 +122,7 @@ export const brandConfig: BrandConfig = {
     { label: "YouTube", href: "https://youtube.com", icon: "youtube" },
   ],
   contact: {
-    email: "concierge@atelierparfum.com",
+    email: "concierge@zein.com",
     phone: "+1 (212) 555-0187",
     address: ["12 Rue de la Paix", "75002 Paris, France"],
     hours: "Mon – Sat · 10:00 – 19:00 CET",
@@ -145,7 +145,7 @@ export const brandConfig: BrandConfig = {
     primaryCta: { label: "Discover the Collection", href: "/shop" },
     secondaryCta: { label: "Our Story", href: "/our-story" },
     image: "/images/hero-main.svg",
-    imageAlt: "Atelier Parfum signature flacon on a moody editorial backdrop",
+    imageAlt: "Zein signature flacon on a moody editorial backdrop",
   },
   freeShippingThreshold: 250,
 };

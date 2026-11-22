@@ -7,8 +7,10 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { ProductGridSkeleton } from "@/components/ui/Skeleton";
 import { Container, Section, SectionHeading } from "@/components/ui/Container";
 import { Reveal, StaggerReveal } from "@/components/animations/Reveal";
+import { useLang } from "@/lib/i18n/provider";
 
 export function FeaturedCollection() {
+  const { t } = useLang();
   const { data: products = [], isLoading } = useProducts({ sort: "featured" });
   const featured = products.filter((p) => p.isFeatured).slice(0, 4);
 
@@ -17,9 +19,9 @@ export function FeaturedCollection() {
       <Container>
         <Reveal>
           <SectionHeading
-            eyebrow="The Collection"
-            title="Signature Compositions"
-            description="Each fragrance is composed in our Grasse atelier using rare natural essences and patient maceration."
+            eyebrow={t.home.featuredEyebrow}
+            title={t.home.featuredTitle}
+            description={t.home.featuredDesc}
           />
         </Reveal>
         {isLoading ? (
@@ -38,7 +40,7 @@ export function FeaturedCollection() {
             href="/shop"
             className="eyebrow inline-flex items-center gap-2 border border-ink px-10 py-4 transition-all hover:bg-ink hover:text-ivory"
           >
-            View All Fragrances <ArrowRight size={14} />
+            {t.home.featuredCta} <ArrowRight size={14} />
           </Link>
         </Reveal>
       </Container>

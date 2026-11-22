@@ -49,7 +49,7 @@ export function Reveal({
           },
         }
       );
-    }, ref);
+    }, ref.current);
     return () => ctx.revert();
   }, [delay, y, once]);
 
@@ -88,7 +88,7 @@ export function StaggerReveal({
           scrollTrigger: { trigger: ref.current, start: "top 85%", once: true },
         }
       );
-    }, ref);
+    }, ref.current);
     return () => ctx.revert();
   }, [stagger]);
 
@@ -124,7 +124,7 @@ export function Parallax({
           scrub: true,
         },
       });
-    }, ref);
+    }, ref.current);
     return () => ctx.revert();
   }, [speed]);
 

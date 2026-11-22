@@ -9,8 +9,10 @@ import { contactSchema, CONTACT_SUBJECTS, type ContactFormValues } from "@/lib/v
 import { Field, Input, Select, Textarea } from "@/components/ui/fields";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/lib/store/store";
+import { useLang } from "@/lib/i18n/provider";
 
 export function ContactForm() {
+  const { t } = useLang();
   const [sent, setSent] = useState(false);
   const mutation = useSubmitContactForm();
   const { push } = useToast();
@@ -21,12 +23,21 @@ export function ContactForm() {
     reset,
   } = useForm<ContactFormValues>({ resolver: zodResolver(contactSchema) });
 
+  const subjKey: Record<string, keyof typeof t.contact> = {
+    "Order & Shipping": "subjOrder",
+    "Returns & Exchanges": "subjReturns",
+    "Product Questions": "subjProduct",
+    "Wholesale & Partnerships": "subjWholesale",
+    Other: "subjOther",
+  };
+  const subjectLabel = (s: string) => t.contact[subjKey[s] ?? "subjOther"];
+
   function onSubmit(values: ContactFormValues) {
     mutation.mutate(values, {
       onSuccess: () => {
         setSent(true);
         reset();
-        push("Message received — we'll reply within 24 hours.");
+        push(t.contact.messageReceived);
       },
       onError: () => push("Something went wrong. Please try again.", "error"),
     });
@@ -36,13 +47,12 @@ export function ContactForm() {
     return (
       <div className="border hairline bg-ivory p-10 text-center">
         <CheckCircle2 size={40} className="mx-auto text-accent" strokeWidth={1.25} />
-        <h3 className="mt-5 font-serif text-2xl font-light">Message Sent</h3>
+        <h3 className="mt-5 font-serif text-2xl font-light">{t.contact.messageSent}</h3>
         <p className="mx-auto mt-3 max-w-sm text-sm font-light leading-relaxed text-muted">
-          Thank you for reaching out. A member of our concierge team will respond within one
-          business day.
+          {t.contact.messageSentBody}
         </p>
         <Button variant="outline" size="sm" className="mt-8" onClick={() => setSent(false)}>
-          Send Another Message
+          {t.contact.sendAnother}
         </Button>
       </div>
     );
@@ -51,29 +61,29 @@ export function ContactForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" noValidate>
       <div className="grid gap-8 sm:grid-cols-2">
-        <Field label="First Name" error={errors.firstName?.message}>
+        <Field label={t.account.firstName} error={errors.firstName?.message}>
           <Input {...register("firstName")} invalid={!!errors.firstName} autoComplete="given-name" />
         </Field>
-        <Field label="Last Name" error={errors.lastName?.message}>
+        <Field label={t.account.lastName} error={errors.lastName?.message}>
           <Input {...register("lastName")} invalid={!!errors.lastName} autoComplete="family-name" />
         </Field>
       </div>
-      <Field label="Email" error={errors.email?.message}>
+      <Field label={t.account.email} error={errors.email?.message}>
         <Input type="email" {...register("email")} invalid={!!errors.email} autoComplete="email" />
       </Field>
-      <Field label="Subject" error={errors.subject?.message}>
+      <Field label={t.contact.subject} error={errors.subject?.message}>
         <Select {...register("subject")} invalid={!!errors.subject}>
-          <option value="">Select a subject…</option>
+          <option value="">{t.contact.selectSubject}</option>
           {CONTACT_SUBJECTS.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>{subjectLabel(s)}</option>
           ))}
         </Select>
       </Field>
-      <Field label="Message" error={errors.message?.message}>
-        <Textarea {...register("message")} invalid={!!errors.message} placeholder="How can we help?" />
+      <Field label={t.contact.message} error={errors.message?.message}>
+        <Textarea {...register("message")} invalid={!!errors.message} placeholder={t.contact.messagePlaceholder} />
       </Field>
       <Button type="submit" size="lg" disabled={mutation.isPending} className="w-full sm:w-auto">
-        {mutation.isPending ? "Sending…" : "Send Message"}
+        {mutation.isPending ? t.account.sending : t.contact.sendMessage}
       </Button>
     </form>
   );

@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { brandConfig } from "@/config/brand.config";
+import { useLang } from "@/lib/i18n/provider";
 import { ButtonLink } from "@/components/ui/Button";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
@@ -15,6 +16,7 @@ const REDUCED =
 
 export function Hero() {
   const rootRef = useRef<HTMLElement>(null);
+  const { t } = useLang();
   const h = brandConfig.hero;
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export function Hero() {
           scrub: true,
         },
       });
-    }, rootRef);
+    }, rootRef.current);
     return () => ctx.revert();
   }, []);
 
@@ -89,23 +91,23 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-20 pt-32 sm:px-8 lg:pb-28" data-hero-copy>
-        <p data-hero-eyebrow className="eyebrow mb-6 text-accent">{h.eyebrow}</p>
+        <p data-hero-eyebrow className="eyebrow mb-6 text-accent">{t.hero.eyebrow}</p>
         <h1 className="max-w-4xl font-serif text-[13vw] font-light leading-[0.95] sm:text-7xl lg:text-[6.5rem]">
-          <span data-hero-title className="block">{h.title}</span>
-          <span data-hero-title className="block italic text-accent">{h.titleEmphasis}</span>
+          <span data-hero-title className="block">{t.hero.title}</span>
+          <span data-hero-title className="block italic text-accent">{t.hero.titleEmphasis}</span>
         </h1>
         <p data-hero-sub className="mt-6 max-w-md text-base font-light leading-relaxed text-ivory/70 sm:text-lg">
-          {h.subtitle}
+          {t.hero.subtitle}
         </p>
         <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
           <span data-hero-cta>
             <ButtonLink href={h.primaryCta.href} variant="light" size="lg">
-              {h.primaryCta.label}
+              {t.hero.primaryCta}
             </ButtonLink>
           </span>
           <span data-hero-cta>
             <ButtonLink href={h.secondaryCta.href} variant="outline" size="lg" className="border-ivory/50 text-ivory hover:border-ivory hover:bg-ivory hover:text-ink">
-              {h.secondaryCta.label}
+              {t.hero.secondaryCta}
             </ButtonLink>
           </span>
         </div>

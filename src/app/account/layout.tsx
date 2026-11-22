@@ -1,15 +1,16 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { brandConfig } from "@/config/brand.config";
+import { Logo } from "@/components/ui/Logo";
 import { AccountNav } from "@/components/account/AccountNav";
+import { AccountContinueLink } from "@/components/account/AccountContinueLink";
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-ivory">
       <header className="border-b hairline">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-          <Link href="/" className="font-serif text-xl tracking-[0.18em]">{brandConfig.logoText}</Link>
-          <Link href="/" className="eyebrow text-muted hover:text-accent">← Continue Shopping</Link>
+          <Link href="/" aria-label="ZEIN home"><Logo className="text-xl" /></Link>
+          <AccountContinueLink />
         </div>
       </header>
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:py-16">

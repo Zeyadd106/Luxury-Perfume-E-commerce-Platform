@@ -74,7 +74,7 @@ export function SearchOverlay() {
       } else {
         gsap.to(overlay, { opacity: 0, duration: 0.25, ease: "power2.in" });
       }
-    }, overlayRef);
+    }, overlay);
     return () => ctx.revert();
   }, [searchOpen]);
 

@@ -6,7 +6,7 @@ import type {
   Review,
 } from "@/types";
 import type { CheckoutFormValues, ContactFormValues } from "@/lib/validations/schemas";
-import { products } from "@/data/products";
+import { readCatalog } from "@/lib/catalog";
 import { collections } from "@/data/collections";
 import { getReviewsForProduct } from "@/data/reviews";
 import { delay } from "@/lib/utils";
@@ -75,25 +75,26 @@ function applySort(list: Product[], sort?: ProductFilters["sort"]): Product[] {
 
 export async function fetchProducts(filters: ProductFilters = {}): Promise<Product[]> {
   await delay(250);
-  return applySort(applyFilters(products, filters), filters.sort);
+  return applySort(applyFilters(readCatalog(), filters), filters.sort);
 }
 
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
   await delay(200);
-  return products.find((p) => p.slug === slug && p.isActive) ?? null;
+  return readCatalog().find((p) => p.slug === slug && p.isActive) ?? null;
 }
 
 export async function fetchProductById(id: string): Promise<Product | null> {
   await delay(150);
-  return products.find((p) => p.id === id) ?? null;
+  return readCatalog().find((p) => p.id === id) ?? null;
 }
 
 export async function fetchRelatedProducts(product: Product, limit = 4): Promise<Product[]> {
   await delay(150);
-  const sameFamily = products.filter(
+  const catalog = readCatalog();
+  const sameFamily = catalog.filter(
     (p) => p.id !== product.id && p.fragranceFamily === product.fragranceFamily && p.isActive
   );
-  const sameCollection = products.filter(
+  const sameCollection = catalog.filter(
     (p) => p.id !== product.id && p.collection === product.collection && p.isActive
   );
   const merged = [...sameCollection, ...sameFamily];
@@ -115,7 +116,7 @@ export async function fetchCollectionProducts(slug: string): Promise<Product[]> 
   const collection = collections.find((c) => c.slug === slug);
   if (!collection) return [];
   const set = new Set(collection.productSlugs);
-  return products.filter((p) => set.has(p.slug) && p.isActive);
+  return readCatalog().filter((p) => (set.has(p.slug) || p.collection === slug) && p.isActive);
 }
 
 export async function fetchReviews(productId: string): Promise<Review[]> {
@@ -126,7 +127,7 @@ export async function fetchReviews(productId: string): Promise<Review[]> {
 export async function searchProducts(query: string, limit = 8): Promise<Product[]> {
   await delay(120);
   if (!query.trim()) return [];
-  return applyFilters(products, { query }).slice(0, limit);
+  return applyFilters(readCatalog(), { query }).slice(0, limit);
 }
 
 export async function subscribeNewsletter(payload: {

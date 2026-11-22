@@ -6,18 +6,19 @@ import { ArrowRight } from "lucide-react";
 import { useCollections } from "@/lib/query/hooks";
 import { Reveal } from "@/components/animations/Reveal";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { useLang } from "@/lib/i18n/provider";
 
 export function CollectionsClient() {
+  const { t } = useLang();
   const { data: collections = [], isLoading } = useCollections();
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:py-16">
       <Reveal className="mb-14 max-w-2xl">
-        <p className="eyebrow mb-4 text-accent">Curated Worlds</p>
-        <h1 className="font-serif text-4xl font-light leading-tight sm:text-6xl">Collections</h1>
+        <p className="eyebrow mb-4 text-accent">{t.collections.eyebrow}</p>
+        <h1 className="font-serif text-4xl font-light leading-tight sm:text-6xl">{t.collections.title}</h1>
         <p className="mt-5 text-[0.95rem] font-light leading-relaxed text-muted">
-          Each collection is a complete olfactory narrative — compositions chosen to be worn together,
-          season after season.
+          {t.collections.intro}
         </p>
       </Reveal>
 
@@ -47,7 +48,7 @@ export function CollectionsClient() {
                   <p className="eyebrow text-accent">{String(i + 1).padStart(2, "0")} — {c.tagline}</p>
                   <h2 className="mt-2 font-serif text-3xl font-light text-ivory">{c.name}</h2>
                   <span className="eyebrow mt-4 inline-flex items-center gap-2 text-ivory/80 transition-colors group-hover:text-accent">
-                    Discover <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
+                    {t.collections.discover} <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
                   </span>
                 </div>
               </Link>

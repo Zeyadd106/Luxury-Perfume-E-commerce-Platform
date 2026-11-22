@@ -9,11 +9,13 @@ import { formatPrice } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
 import { ButtonLink } from "@/components/ui/Button";
 import { brandConfig } from "@/config/brand.config";
+import { useLang } from "@/lib/i18n/provider";
 
 const FREE_SHIPPING = brandConfig.freeShippingThreshold;
 const FLAT_SHIPPING = 15;
 
 export function CartPage() {
+  const { t } = useLang();
   const { items, subtotal, updateQuantity, removeItem } = useCart();
   const { eligible } = useFreeShippingProgress();
   const { push } = useToast();
@@ -31,9 +33,9 @@ export function CartPage() {
       const c = code.trim().toUpperCase();
       setApplied(c);
       sessionStorage.setItem("atelier-discount", c);
-      push("Code FIRST15 applied — 15% off");
+      push(t.cart.codeAppliedToast);
     } else {
-      setCodeError("Invalid code. Try FIRST15 for 15% off.");
+      setCodeError(t.cart.invalidCode);
     }
   }
 
@@ -41,12 +43,12 @@ export function CartPage() {
     return (
       <Container className="flex flex-col items-center py-28 text-center">
         <ShoppingBag size={44} strokeWidth={1} className="mb-6 text-muted" />
-        <h1 className="font-serif text-4xl font-light">Your Bag is Empty</h1>
+        <h1 className="font-serif text-4xl font-light">{t.cart.empty}</h1>
         <p className="mt-4 max-w-sm text-sm font-light text-muted">
-          Discover compositions crafted to linger — explore the full collection.
+          {t.cart.emptyHint}
         </p>
         <div className="mt-10">
-          <ButtonLink href="/shop" size="lg">Shop All Fragrances</ButtonLink>
+          <ButtonLink href="/shop" size="lg">{t.shop.title}</ButtonLink>
         </div>
       </Container>
     );
@@ -54,7 +56,7 @@ export function CartPage() {
 
   return (
     <Container className="py-12 lg:py-16">
-      <h1 className="mb-10 font-serif text-4xl font-light sm:text-5xl">Your Bag</h1>
+      <h1 className="mb-10 font-serif text-4xl font-light sm:text-5xl">{t.cart.title}</h1>
 
       <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
         {/* items */}
@@ -76,7 +78,7 @@ export function CartPage() {
                     <button
                       onClick={() => {
                         removeItem(item.productId, item.sizeMl);
-                        push("Item removed", "info");
+                        push(t.cart.itemRemoved, "info");
                       }}
                       className="text-muted transition-colors hover:text-red-800"
                       aria-label={`Remove ${item.name}`}
@@ -86,11 +88,11 @@ export function CartPage() {
                   </div>
                   <div className="mt-auto flex items-center justify-between pt-4">
                     <div className="flex items-center border hairline">
-                      <button onClick={() => updateQuantity(item.productId, item.sizeMl, item.quantity - 1)} className="flex h-9 w-9 items-center justify-center hover:bg-ink/5" aria-label="Decrease">
+                      <button onClick={() => updateQuantity(item.productId, item.sizeMl, item.quantity - 1)} className="flex h-9 w-9 items-center justify-center hover:bg-ivory/10" aria-label="Decrease">
                         <Minus size={13} />
                       </button>
                       <span className="w-9 text-center text-sm">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.productId, item.sizeMl, item.quantity + 1)} className="flex h-9 w-9 items-center justify-center hover:bg-ink/5" aria-label="Increase">
+                      <button onClick={() => updateQuantity(item.productId, item.sizeMl, item.quantity + 1)} className="flex h-9 w-9 items-center justify-center hover:bg-ivory/10" aria-label="Increase">
                         <Plus size={13} />
                       </button>
                     </div>
@@ -101,38 +103,38 @@ export function CartPage() {
             ))}
           </ul>
           <Link href="/shop" className="eyebrow mt-8 inline-flex items-center gap-2 text-muted hover:text-accent transition-colors">
-            ← Continue Shopping
+            ← {t.cart.continue}
           </Link>
         </div>
 
         {/* summary */}
         <aside className="h-fit border hairline bg-ivory p-8 lg:sticky lg:top-28">
-          <h2 className="eyebrow mb-6 text-muted">Order Summary</h2>
+          <h2 className="eyebrow mb-6 text-muted">{t.checkout.orderSummary}</h2>
 
           {!eligible && items.length > 0 && (
             <p className="mb-6 border border-accent/40 bg-accent/10 px-4 py-3 text-xs font-light text-ink/80">
-              Add {formatPrice(FREE_SHIPPING - subtotal)} more for complimentary shipping.
+              {t.cart.addMoreForFree.replace("{amount}", formatPrice(FREE_SHIPPING - subtotal))}
             </p>
           )}
 
           {/* discount */}
           <div className="mb-6">
-            <p className="eyebrow mb-2 text-muted">Discount Code</p>
+            <p className="eyebrow mb-2 text-muted">{t.cart.discountCode}</p>
             {applied ? (
               <p className="flex items-center justify-between border-b border-accent/50 pb-2 text-sm">
-                <span className="font-medium text-accent">{applied} — 15% off</span>
-                <button onClick={() => { setApplied(null); sessionStorage.removeItem("atelier-discount"); }} className="text-xs text-muted hover:text-ink">Remove</button>
+                <span className="font-medium text-accent">{applied} — {t.cart.codeApplied}</span>
+                <button onClick={() => { setApplied(null); sessionStorage.removeItem("atelier-discount"); }} className="text-xs text-muted hover:text-ivory">{t.cart.remove}</button>
               </p>
             ) : (
               <div className="flex gap-2">
                 <input
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="Enter code"
+                  placeholder={t.cart.enterCode}
                   className="w-full border-b hairline bg-transparent px-0 py-2 text-sm font-light focus:border-accent focus:outline-none"
                 />
-                <button onClick={applyCode} className="eyebrow shrink-0 text-accent hover:text-ink">
-                  Apply
+                <button onClick={applyCode} className="eyebrow shrink-0 text-accent hover:text-ivory">
+                  {t.cart.apply}
                 </button>
               </div>
             )}
@@ -141,30 +143,30 @@ export function CartPage() {
 
           <dl className="space-y-3 text-sm font-light">
             <div className="flex justify-between">
-              <dt className="text-muted">Subtotal</dt>
+              <dt className="text-muted">{t.cart.subtotal}</dt>
               <dd>{formatPrice(subtotal)}</dd>
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-accent">
-                <dt>Discount (15%)</dt>
+                <dt>{t.cart.discount} (15%)</dt>
                 <dd>−{formatPrice(discount)}</dd>
               </div>
             )}
             <div className="flex justify-between">
-              <dt className="text-muted">Shipping</dt>
-              <dd>{shipping === 0 ? "Complimentary" : formatPrice(shipping)}</dd>
+              <dt className="text-muted">{t.cart.shipping}</dt>
+              <dd>{shipping === 0 ? t.cart.complimentary : formatPrice(shipping)}</dd>
             </div>
             <div className="flex justify-between border-t hairline pt-4 text-base font-medium">
-              <dt>Total</dt>
+              <dt>{t.cart.total}</dt>
               <dd>{formatPrice(total)}</dd>
             </div>
           </dl>
 
           <ButtonLink href="/checkout" size="lg" className="mt-8 w-full">
-            Proceed to Checkout <ArrowRight size={14} />
+            {t.cart.checkout} <ArrowRight size={14} />
           </ButtonLink>
           <p className="mt-4 text-center text-[0.625rem] font-light tracking-wide text-muted">
-            Secure checkout · {brandConfig.name} never stores card details
+            {t.cart.secureNote}
           </p>
         </aside>
       </div>

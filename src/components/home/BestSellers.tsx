@@ -9,8 +9,10 @@ import { ProductGridSkeleton } from "@/components/ui/Skeleton";
 import { Container, Section, SectionHeading } from "@/components/ui/Container";
 import { Reveal, StaggerReveal } from "@/components/animations/Reveal";
 import { brandConfig } from "@/config/brand.config";
+import { useLang } from "@/lib/i18n/provider";
 
 export function BestSellers() {
+  const { t } = useLang();
   const { data: products = [], isLoading } = useProducts({ badge: "bestsellers", sort: "popular" });
   const best = products.slice(0, 4);
 
@@ -23,7 +25,7 @@ export function BestSellers() {
             <div className="relative aspect-[3/4] overflow-hidden">
               <Image
                 src="/images/campaign-1.svg"
-                alt="Atelier Parfum campaign"
+                alt="Zein campaign"
                 fill
                 sizes="(max-width:1024px) 100vw, 40vw"
                 className="object-cover"
@@ -42,9 +44,9 @@ export function BestSellers() {
               <SectionHeading
                 align="left"
                 dark
-                eyebrow="Most Coveted"
-                title="Best Sellers"
-                description="Ranked by the collectors who know our house best."
+                eyebrow={t.home.bestSellersEyebrow}
+                title={t.home.bestSellersTitle}
+                description={t.home.bestSellersDesc}
               />
             </Reveal>
             {isLoading ? (
@@ -60,7 +62,7 @@ export function BestSellers() {
             )}
             <Reveal className="mt-10">
               <Link href="/shop?filter=bestsellers" className="eyebrow inline-flex items-center gap-2 text-accent hover:text-ivory transition-colors">
-                Shop Best Sellers <ArrowRight size={14} />
+                {t.home.bestSellersCta} <ArrowRight size={14} />
               </Link>
             </Reveal>
           </div>

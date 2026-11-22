@@ -7,6 +7,7 @@ import type { FragranceFamily } from "@/types";
 import { fragranceFamilies } from "@/data/products";
 import { Container, Section, SectionHeading } from "@/components/ui/Container";
 import { Reveal, StaggerReveal } from "@/components/animations/Reveal";
+import { useLang } from "@/lib/i18n/provider";
 
 const icons: Record<FragranceFamily, typeof Leaf> = {
   woody: TreePine,
@@ -19,16 +20,21 @@ const icons: Record<FragranceFamily, typeof Leaf> = {
 };
 
 export function FragranceDiscovery() {
+  const { t } = useLang();
   const router = useRouter();
+
+  const fam = t.home as unknown as Record<string, string>;
+  const familyLabel = (v: string) => fam[`family${v[0].toUpperCase()}${v.slice(1)}Label`] ?? v;
+  const familyDesc = (v: string) => fam[`family${v[0].toUpperCase()}${v.slice(1)}Desc`] ?? "";
 
   return (
     <Section className="py-20 sm:py-28">
       <Container>
         <Reveal>
           <SectionHeading
-            eyebrow="Fragrance Families"
-            title="Discover Your Family"
-            description="Every great scent begins with a family. Find the accord that speaks to you."
+            eyebrow={t.home.familiesEyebrow}
+            title={t.home.familiesTitle}
+            description={t.home.familiesDesc}
           />
         </Reveal>
         <StaggerReveal className="grid grid-cols-2 gap-px bg-ink/10 sm:grid-cols-3 lg:grid-cols-7">
@@ -42,9 +48,9 @@ export function FragranceDiscovery() {
                 className="group flex flex-col items-center bg-ivory px-3 py-8 text-center transition-colors hover:bg-ink hover:text-ivory"
               >
                 <Icon size={26} strokeWidth={1.25} className="mb-4 text-accent transition-transform duration-500 group-hover:scale-110" />
-                <span className="font-serif text-lg font-light">{f.label}</span>
+                <span className="font-serif text-lg font-light">{familyLabel(f.value)}</span>
                 <span className="mt-1 hidden text-[0.625rem] font-light leading-snug text-muted group-hover:text-ivory/60 sm:block">
-                  {f.description}
+                  {familyDesc(f.value)}
                 </span>
                 <ArrowRight size={12} className="mt-3 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100" />
               </Link>

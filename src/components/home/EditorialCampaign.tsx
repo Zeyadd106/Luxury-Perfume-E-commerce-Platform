@@ -1,15 +1,19 @@
+"use client";
+
 import Image from "next/image";
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/animations/Reveal";
+import { useLang } from "@/lib/i18n/provider";
 
 export function EditorialCampaign() {
+  const { t } = useLang();
   return (
     <section className="relative overflow-hidden bg-ink text-ivory">
       <div className="grid lg:grid-cols-2">
         <div className="relative min-h-[50vh] lg:min-h-[80vh]">
           <Image
             src="/images/campaign-2.svg"
-            alt="Editorial campaign — Atelier Parfum"
+            alt="Editorial campaign — Zein"
             fill
             sizes="(max-width:1024px) 100vw, 50vw"
             className="object-cover"
@@ -17,18 +21,17 @@ export function EditorialCampaign() {
         </div>
         <div className="flex flex-col justify-center px-6 py-20 sm:px-12 lg:px-20">
           <Reveal>
-            <p className="eyebrow mb-6 text-accent">The Autumn Edit</p>
+            <p className="eyebrow mb-6 text-accent">{t.home.editorialEyebrow}</p>
             <h2 className="font-serif text-4xl font-light leading-[1.08] sm:text-5xl lg:text-6xl">
-              Amber, smoke and
-              <span className="italic text-accent"> golden hour.</span>
+              {t.home.editorialTitleA}
+              <span className="italic text-accent"> {t.home.editorialTitleB}</span>
             </h2>
             <p className="mt-6 max-w-md text-[0.95rem] font-light leading-relaxed text-ivory/60">
-              Our seasonal edit gathers the house&rsquo;s warmest compositions — amber extraits,
-              smoky woods and resins that bloom as the light fades.
+              {t.home.editorialBody}
             </p>
             <div className="mt-10">
               <ButtonLink href="/collections/limited" variant="light" size="lg">
-                Explore the Edit
+                {t.home.editorialCta}
               </ButtonLink>
             </div>
           </Reveal>

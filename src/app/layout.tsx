@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import { brandConfig } from "@/config/brand.config";
 import { Providers } from "@/lib/query/providers";
+import { LanguageProvider } from "@/lib/i18n/provider";
 import { StoreProvider } from "@/lib/store/store";
 import "./globals.css";
 
@@ -19,7 +20,7 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://atelierparfum.example.com"),
+  metadataBase: new URL("https://zein.com"),
   title: {
     default: `${brandConfig.name} — ${brandConfig.tagline}`,
     template: `%s — ${brandConfig.name}`,
@@ -47,11 +48,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const t = brandConfig.theme;
   return (
-    <html lang="en" className={`${cormorant.variable} ${jost.variable} h-full antialiased`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`${cormorant.variable} ${jost.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-ivory text-ink">
         <style>{`:root{--brand-ink:${t.ink};--brand-ivory:${t.ivory};--brand-accent:${t.accent};--brand-muted:${t.muted};--brand-line:${t.line};}`}</style>
         <Providers>
-          <StoreProvider>{children}</StoreProvider>
+          <StoreProvider>
+            <LanguageProvider>{children}</LanguageProvider>
+          </StoreProvider>
         </Providers>
       </body>
     </html>

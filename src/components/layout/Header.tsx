@@ -7,12 +7,23 @@ import { useEffect, useState } from "react";
 import { brandConfig } from "@/config/brand.config";
 import { useCart, useUI } from "@/lib/store/store";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/Logo";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { useLang } from "@/lib/i18n/provider";
 import { MobileMenu } from "./MobileMenu";
 
 export function Header() {
   const pathname = usePathname();
   const { count } = useCart();
   const { searchOpen, toggleSearch, openCart, mobileMenuOpen, toggleMobileMenu, closeMobileMenu } = useUI();
+  const { t } = useLang();
+  const navKey: Record<string, keyof typeof t.nav> = {
+    Home: "home",
+    Shop: "shop",
+    Collections: "collections",
+    "Our Story": "ourStory",
+    Contact: "contact",
+  };
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [lastY, setLastY] = useState(0);
@@ -37,10 +48,8 @@ export function Header() {
     <>
       <header
         className={cn(
-          "sticky top-0 z-50 transition-all duration-500",
-          scrolled
-            ? "border-b hairline bg-ivory/90 backdrop-blur-md"
-            : "border-b border-transparent bg-transparent",
+          "sticky top-0 z-50 border-b bg-ink text-ivory transition-all duration-500",
+          scrolled ? "border-ivory/20" : "border-transparent",
           hidden && "-translate-y-full"
         )}
       >
@@ -62,10 +71,10 @@ export function Header() {
                   href={link.href}
                   className={cn(
                     "eyebrow transition-colors hover:text-accent",
-                    pathname === link.href ? "text-accent" : "text-ink/80"
+                    pathname === link.href ? "text-accent" : "text-ivory/70"
                   )}
                 >
-                  {link.label}
+                  {t.nav[navKey[link.label] ?? "home"]}
                 </Link>
               ))}
             </nav>
@@ -73,21 +82,20 @@ export function Header() {
 
           {/* center: logo */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-center" aria-label={brandConfig.name}>
-            <span className="font-serif text-2xl font-medium tracking-[0.18em] sm:text-[1.7rem]">
-              {brandConfig.logoText}
-            </span>
-            <span className="mt-0.5 block text-[0.5625rem] uppercase tracking-[0.42em] text-muted">
+            <Logo tone="light" className="text-2xl sm:text-[1.7rem]" />
+            <span className="mt-0.5 block text-[0.5625rem] uppercase tracking-[0.42em] text-ivory/50">
               {brandConfig.tagline.split(" ").slice(0, 3).join(" ")}
             </span>
           </Link>
 
           {/* right: actions */}
           <div className="flex flex-1 items-center justify-end gap-1 sm:gap-2">
+            <LanguageSwitcher className="me-1 hidden md:flex" dark />
             <button
               onClick={toggleSearch}
               className={cn(
                 "flex h-10 w-10 items-center justify-center transition-colors hover:text-accent",
-                searchOpen ? "text-accent" : "text-ink"
+                searchOpen ? "text-accent" : "text-ivory"
               )}
               aria-label="Search"
               aria-expanded={searchOpen}
@@ -108,7 +116,7 @@ export function Header() {
             >
               <ShoppingBag size={18} strokeWidth={1.5} />
               {count > 0 && (
-                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center bg-accent px-1 text-[0.5625rem] font-semibold text-ink">
+                <span className="absolute end-1 top-1 flex h-4 min-w-4 items-center justify-center bg-accent px-1 text-[0.5625rem] font-semibold text-ink">
                   {count}
                 </span>
               )}

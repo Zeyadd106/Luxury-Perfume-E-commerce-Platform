@@ -65,7 +65,7 @@ export type AddressFormValues = z.infer<typeof addressSchema>;
 
 export const checkoutSchema = addressSchema.extend({
   shippingMethod: z.enum(["standard", "express"]),
-  paymentMethod: z.enum(["card", "paypal"]),
+  paymentMethod: z.literal("cod"),
   discountCode: z.string().max(30).optional(),
 });
 export type CheckoutFormValues = z.infer<typeof checkoutSchema>;

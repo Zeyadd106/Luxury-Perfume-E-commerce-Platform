@@ -66,6 +66,23 @@ src/
 public/images/               # Generated SVG product + editorial imagery
 ```
 
+## Admin Dashboard
+
+Visit `/admin` (passcode: `zein-admin` — a demo gate, replace with real auth
+before production). The dashboard lets the brand owner:
+
+- Browse, search, edit, and delete products
+- Add new fragrances with name, slug, descriptions, category, collection,
+  fragrance family, gender, badge, rating, stock, notes, ingredients, images
+- Manage sizes in ml with per-size pricing, compare-at prices, and stock flags
+- Toggle visibility (active/hidden), featured, bestseller, and new-arrival flags
+- Reset the catalog back to the seed data
+
+Edits persist to `localStorage` (`zein-catalog-v1`) and broadcast via a
+`storage`/custom event — every open tab and every TanStack Query cache
+invalidates and refetches instantly, so storefront pages (shop grid, product
+detail, search, collections, cart prices) reflect changes in real time.
+
 ## Backend Integration Notes
 
 Everything is intentionally mock-based but interface-ready:

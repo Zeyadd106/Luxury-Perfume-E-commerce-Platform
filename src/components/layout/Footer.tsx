@@ -6,7 +6,9 @@ import { brandConfig } from "@/config/brand.config";
 import { useNewsletterSubscription } from "@/lib/query/hooks";
 import { useToast } from "@/lib/store/store";
 import { SocialIcon } from "@/components/ui/SocialIcons";
+import { Logo } from "@/components/ui/Logo";
 import { afterMount } from "@/lib/utils";
+import { useLang } from "@/lib/i18n/provider";
 
 export function Footer() {
   const [year, setYear] = useState<number | null>(null);
@@ -15,6 +17,7 @@ export function Footer() {
   const [error, setError] = useState("");
   const subscribe = useNewsletterSubscription();
   const { push } = useToast();
+  const { t } = useLang();
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -41,12 +44,12 @@ export function Footer() {
       <div className="border-b border-ivory/10">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 lg:grid-cols-2 lg:items-center">
           <div>
-            <p className="eyebrow text-accent">The Maison Letter</p>
+            <p className="eyebrow text-accent">{t.footer.newsletterTitle}</p>
             <h3 className="mt-3 font-serif text-3xl font-light sm:text-4xl">
-              First access to new compositions
+              {t.footer.newsletterHeading}
             </h3>
             <p className="mt-3 max-w-md text-sm font-light leading-relaxed text-ivory/60">
-              Receive private previews, atelier stories and member-only offerings. One letter a month, never more.
+              {t.footer.newsletterBody}
             </p>
           </div>
           <form onSubmit={onSubmit} className="lg:justify-self-end lg:w-full lg:max-w-md">
@@ -55,7 +58,7 @@ export function Footer() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your email address"
+                placeholder={t.footer.newsletterPlaceholder}
                 aria-label="Email address"
                 className="w-full bg-transparent text-sm font-light text-ivory placeholder:text-ivory/40 focus:outline-none"
               />
@@ -64,7 +67,7 @@ export function Footer() {
                 disabled={subscribe.isPending}
                 className="eyebrow shrink-0 text-accent transition-colors hover:text-ivory disabled:opacity-50"
               >
-                {subscribe.isPending ? "Joining…" : "Subscribe"}
+                {subscribe.isPending ? "…" : t.footer.newsletterButton}
               </button>
             </div>
             {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
@@ -75,7 +78,7 @@ export function Footer() {
       {/* link columns */}
       <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-serif text-2xl tracking-[0.18em]">{brandConfig.logoText}</p>
+          <Logo tone="light" className="text-2xl" />
           <p className="mt-1 text-[0.5625rem] uppercase tracking-[0.42em] text-ivory/40">{brandConfig.tagline}</p>
           <p className="mt-6 max-w-xs text-sm font-light leading-relaxed text-ivory/60">{brandConfig.description}</p>
           <div className="mt-6 flex gap-3">
@@ -94,10 +97,10 @@ export function Footer() {
           </div>
         </div>
 
-        <FooterColumn title="Shop" links={brandConfig.footerNavigation.shop} />
-        <FooterColumn title="The House" links={brandConfig.footerNavigation.house} />
+        <FooterColumn title={t.footer.shop} links={brandConfig.footerNavigation.shop} />
+        <FooterColumn title={t.footer.house} links={brandConfig.footerNavigation.house} />
         <div>
-          <p className="eyebrow mb-6 text-ivory/40">Client Care</p>
+          <p className="eyebrow mb-6 text-ivory/40">{t.footer.clientCare}</p>
           <ul className="space-y-3">
             {brandConfig.footerNavigation.help.map((l) => (
               <li key={l.label}>
@@ -122,10 +125,10 @@ export function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-6 text-[0.6875rem] font-light tracking-[0.14em] text-ivory/40 sm:flex-row sm:px-8">
           <p>© {year ?? ""} {brandConfig.name}. {brandConfig.tagline}.</p>
           <div className="flex items-center gap-5">
-            <Link href="/contact" className="hover:text-accent">Privacy</Link>
-            <Link href="/contact" className="hover:text-accent">Terms</Link>
-            <Link href="/contact" className="hover:text-accent">Shipping</Link>
-            <span className="hidden sm:inline">Visa · Mastercard · Amex · PayPal</span>
+            <Link href="/contact" className="hover:text-accent">{t.footer.privacy}</Link>
+            <Link href="/contact" className="hover:text-accent">{t.footer.terms}</Link>
+            <Link href="/contact" className="hover:text-accent">{t.footer.shipping}</Link>
+            <span className="hidden sm:inline">{t.footer.payments}</span>
           </div>
         </div>
       </div>

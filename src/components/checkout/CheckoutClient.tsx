@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Lock, Truck } from "lucide-react";
+import { Banknote, CheckCircle2, Lock, Truck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,8 @@ import type { Order } from "@/types";
 import { usePlaceOrder } from "@/lib/query/hooks";
 import { checkoutSchema, type CheckoutFormValues } from "@/lib/validations/schemas";
 import { useCart, useToast } from "@/lib/store/store";
+import { isAuthenticated } from "@/lib/auth";
+import { useLang } from "@/lib/i18n/provider";
 import { formatPrice, afterMount, cn } from "@/lib/utils";
 import { Field, Input, Select } from "@/components/ui/fields";
 import { Button } from "@/components/ui/Button";
@@ -34,6 +36,7 @@ export function CheckoutClient() {
   const placeOrder = usePlaceOrder();
   const { push } = useToast();
   const router = useRouter();
+  const { t } = useLang();
   const [placed, setPlaced] = useState<Order | null>(null);
   const [submitError, setSubmitError] = useState("");
   const [appliedCode, setAppliedCode] = useState<string | undefined>(undefined);
@@ -53,10 +56,10 @@ export function CheckoutClient() {
     formState: { errors },
   } = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
-    defaultValues: { shippingMethod: "standard", paymentMethod: "card" },
+    defaultValues: { shippingMethod: "standard", paymentMethod: "cod" },
   });
 
-  const { shippingMethod, paymentMethod } = useWatch({ control });
+  const { shippingMethod } = useWatch({ control });
   const shippingCost = useMemo(() => {
     if (items.length === 0) return 0;
     if (subtotal - discount >= brandConfig.freeShippingThreshold) return 0;
@@ -66,6 +69,11 @@ export function CheckoutClient() {
 
   function onSubmit(values: CheckoutFormValues) {
     setSubmitError("");
+    if (!isAuthenticated()) {
+      push("Please sign in or create an account to place your order.", "info");
+      router.push("/account/login?next=/checkout");
+      return;
+    }
     placeOrder.mutate(
       {
         customer: {
@@ -109,18 +117,16 @@ export function CheckoutClient() {
     return (
       <div className="mx-auto flex max-w-2xl flex-col items-center px-5 py-24 text-center">
         <CheckCircle2 size={56} strokeWidth={1} className="text-accent" />
-        <p className="eyebrow mt-8 text-accent">Order Confirmed</p>
-        <h1 className="mt-3 font-serif text-4xl font-light sm:text-5xl">Merci, {placed.shippingAddress.firstName}.</h1>
+        <p className="eyebrow mt-8 text-accent">{t.checkout.confirmed}</p>
+        <h1 className="mt-3 font-serif text-4xl font-light sm:text-5xl">{t.checkout.thankYou} {placed.shippingAddress.firstName}.</h1>
         <p className="mt-5 max-w-md text-sm font-light leading-relaxed text-muted">
-          Your order <span className="font-medium text-ink">{placed.id}</span> has been received.
-          A confirmation has been sent to {placed.shippingAddress.email}. Your fragrances will be
-          prepared and dispatched within 2–3 business days.
+          {t.checkout.orderReceived.replace("{id}", placed.id).replace("{email}", placed.shippingAddress.email)}
         </p>
         <div className="mt-10 grid w-full grid-cols-3 gap-px border hairline bg-ink/10 text-center">
           {[
-            ["Order", placed.id],
-            ["Total", formatPrice(placed.total)],
-            ["Status", placed.status],
+            [t.checkout.order, placed.id],
+            [t.checkout.total, formatPrice(placed.total)],
+            [t.checkout.status, placed.status],
           ].map(([k, v]) => (
             <div key={k} className="bg-ivory px-4 py-6">
               <p className="eyebrow text-muted">{k}</p>
@@ -129,8 +135,8 @@ export function CheckoutClient() {
           ))}
         </div>
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-          <Button onClick={() => router.push("/account/orders")} size="lg">View My Orders</Button>
-          <ButtonLinkLight href="/shop" label="Continue Shopping" />
+          <Button onClick={() => router.push("/account/orders")} size="lg">{t.account.orders}</Button>
+          <ButtonLinkLight href="/shop" label={t.checkout.continueShopping} />
         </div>
       </div>
     );
@@ -139,10 +145,10 @@ export function CheckoutClient() {
   if (items.length === 0) {
     return (
       <div className="mx-auto flex max-w-2xl flex-col items-center px-5 py-28 text-center">
-        <h1 className="font-serif text-4xl font-light">Nothing to Check Out</h1>
-        <p className="mt-4 text-sm font-light text-muted">Your bag is empty — add a fragrance first.</p>
+        <h1 className="font-serif text-4xl font-light">{t.cart.empty}</h1>
+        <p className="mt-4 text-sm font-light text-muted">{t.cart.emptyHint}</p>
         <div className="mt-10">
-          <Button onClick={() => router.push("/shop")}>Shop All Fragrances</Button>
+          <Button onClick={() => router.push("/shop")}>{t.shop.title}</Button>
         </div>
       </div>
     );
@@ -150,19 +156,19 @@ export function CheckoutClient() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:py-16">
-      <h1 className="mb-10 font-serif text-4xl font-light sm:text-5xl">Checkout</h1>
+      <h1 className="mb-10 font-serif text-4xl font-light sm:text-5xl">{t.checkout.title}</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-12 lg:grid-cols-[1.5fr_1fr]">
         {/* form columns */}
         <div className="space-y-14">
           {/* contact */}
           <fieldset>
-            <legend className="eyebrow mb-6 text-accent">01 — Contact</legend>
+            <legend className="eyebrow mb-6 text-accent">{t.checkout.contact}</legend>
             <div className="grid gap-8 sm:grid-cols-2">
-              <Field label="Email" error={errors.email?.message}>
+              <Field label={t.checkout.email} error={errors.email?.message}>
                 <Input type="email" {...register("email")} invalid={!!errors.email} autoComplete="email" />
               </Field>
-              <Field label="Phone" error={errors.phone?.message} hint="For delivery updates">
+              <Field label={t.checkout.phone} error={errors.phone?.message} hint={t.checkout.phoneHint}>
                 <Input type="tel" {...register("phone")} invalid={!!errors.phone} autoComplete="tel" />
               </Field>
             </div>
@@ -170,32 +176,32 @@ export function CheckoutClient() {
 
           {/* shipping */}
           <fieldset>
-            <legend className="eyebrow mb-6 text-accent">02 — Shipping Address</legend>
+            <legend className="eyebrow mb-6 text-accent">{t.checkout.shipping}</legend>
             <div className="grid gap-8 sm:grid-cols-2">
-              <Field label="First Name" error={errors.firstName?.message}>
+              <Field label={t.checkout.firstName} error={errors.firstName?.message}>
                 <Input {...register("firstName")} invalid={!!errors.firstName} autoComplete="given-name" />
               </Field>
-              <Field label="Last Name" error={errors.lastName?.message}>
+              <Field label={t.checkout.lastName} error={errors.lastName?.message}>
                 <Input {...register("lastName")} invalid={!!errors.lastName} autoComplete="family-name" />
               </Field>
-              <Field label="Address" error={errors.address1?.message} className="sm:col-span-2">
+              <Field label={t.checkout.address} error={errors.address1?.message} className="sm:col-span-2">
                 <Input {...register("address1")} invalid={!!errors.address1} autoComplete="address-line1" />
               </Field>
-              <Field label="Apartment, suite, etc." error={errors.address2?.message} className="sm:col-span-2">
+              <Field label={t.checkout.address2} error={errors.address2?.message} className="sm:col-span-2">
                 <Input {...register("address2")} invalid={!!errors.address2} autoComplete="address-line2" />
               </Field>
-              <Field label="City" error={errors.city?.message}>
+              <Field label={t.checkout.city} error={errors.city?.message}>
                 <Input {...register("city")} invalid={!!errors.city} autoComplete="address-level2" />
               </Field>
-              <Field label="Country" error={errors.country?.message}>
+              <Field label={t.checkout.country} error={errors.country?.message}>
                 <Select {...register("country")} invalid={!!errors.country}>
-                  <option value="">Select…</option>
+                  <option value="">{t.checkout.selectCountry}</option>
                   {COUNTRIES.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </Select>
               </Field>
-              <Field label="Postal Code" error={errors.postalCode?.message}>
+              <Field label={t.checkout.postalCode} error={errors.postalCode?.message}>
                 <Input {...register("postalCode")} invalid={!!errors.postalCode} autoComplete="postal-code" />
               </Field>
             </div>
@@ -204,18 +210,18 @@ export function CheckoutClient() {
           {/* shipping method */}
           <fieldset>
             <legend className="eyebrow mb-6 flex items-center gap-2 text-accent">
-              <Truck size={14} /> 03 — Shipping Method
+              <Truck size={14} /> {t.checkout.delivery}
             </legend>
             <div className="grid gap-3 sm:grid-cols-2">
               {[
-                { value: "standard", label: "Standard", desc: "3–5 business days", price: subtotal - discount >= brandConfig.freeShippingThreshold ? 0 : 15 },
-                { value: "express", label: "Express", desc: "1–2 business days", price: subtotal - discount >= brandConfig.freeShippingThreshold ? 20 : 35 },
+                { value: "standard", label: t.checkout.standard, desc: t.checkout.standardDesc, price: subtotal - discount >= brandConfig.freeShippingThreshold ? 0 : 15 },
+                { value: "express", label: t.checkout.express, desc: t.checkout.expressDesc, price: subtotal - discount >= brandConfig.freeShippingThreshold ? 20 : 35 },
               ].map((m) => (
                 <label
                   key={m.value}
                   className={cn(
                     "flex cursor-pointer items-center justify-between border p-5 transition-colors",
-                    shippingMethod === m.value ? "border-ink bg-ink/5" : "hairline hover:border-ink/60"
+                    shippingMethod === m.value ? "border-ink bg-ink/5" : "hairline hover:border-ivory/60"
                   )}
                 >
                   <span className="flex items-center gap-3">
@@ -234,38 +240,25 @@ export function CheckoutClient() {
           {/* payment */}
           <fieldset>
             <legend className="eyebrow mb-6 flex items-center gap-2 text-accent">
-              <Lock size={14} /> 04 — Payment
+              <Lock size={14} /> {t.checkout.payment}
             </legend>
-            <p className="mb-5 text-xs font-light leading-relaxed text-muted">
-              Demo checkout — no payment is processed and no card details are collected. A real
-              provider (Stripe, Adyen…) can be plugged into <code>placeOrder</code> in{" "}
-              <code>src/services/api.ts</code>.
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                { value: "card", label: "Credit / Debit Card" },
-                { value: "paypal", label: "PayPal" },
-              ].map((m) => (
-                <label
-                  key={m.value}
-                  className={cn(
-                    "flex cursor-pointer items-center gap-3 border p-5 transition-colors",
-                    paymentMethod === m.value ? "border-ink bg-ink/5" : "hairline hover:border-ink/60"
-                  )}
-                >
-                  <input type="radio" value={m.value} {...register("paymentMethod")} className="accent-[#c6a46c]" />
-                  <span className="text-sm font-medium">{m.label}</span>
-                </label>
-              ))}
+            <div className="flex items-start gap-4 border hairline bg-ivory p-6">
+              <Banknote size={22} strokeWidth={1.25} className="mt-0.5 shrink-0 text-accent" />
+              <div>
+                <p className="text-sm font-medium">{t.checkout.codTitle}</p>
+                <p className="mt-1.5 text-xs font-light leading-relaxed text-muted">
+                  {t.checkout.codBody}
+                </p>
+              </div>
             </div>
-            {errors.paymentMethod && <p className="mt-2 text-xs text-red-700">{errors.paymentMethod.message}</p>}
+            <input type="hidden" {...register("paymentMethod")} />
             <input type="hidden" {...register("discountCode")} />
           </fieldset>
         </div>
 
         {/* summary */}
         <aside className="h-fit border hairline bg-ivory p-8 lg:sticky lg:top-28">
-          <h2 className="eyebrow mb-6 text-muted">Order Summary</h2>
+          <h2 className="eyebrow mb-6 text-muted">{t.checkout.orderSummary}</h2>
           <ul className="mb-6 max-h-64 space-y-4 overflow-y-auto">
             {items.map((item) => (
               <li key={`${item.productId}-${item.sizeMl}`} className="flex items-center gap-4">
@@ -282,21 +275,21 @@ export function CheckoutClient() {
           </ul>
           <dl className="space-y-3 border-t hairline pt-5 text-sm font-light">
             <div className="flex justify-between">
-              <dt className="text-muted">Subtotal</dt>
+              <dt className="text-muted">{t.cart.subtotal}</dt>
               <dd>{formatPrice(subtotal)}</dd>
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-accent">
-                <dt>Discount</dt>
+                <dt>{t.cart.discount}</dt>
                 <dd>−{formatPrice(discount)}</dd>
               </div>
             )}
             <div className="flex justify-between">
-              <dt className="text-muted">Shipping</dt>
-              <dd>{shippingCost === 0 ? "Complimentary" : formatPrice(shippingCost)}</dd>
+              <dt className="text-muted">{t.cart.shipping}</dt>
+              <dd>{shippingCost === 0 ? t.checkout.complimentary : formatPrice(shippingCost)}</dd>
             </div>
             <div className="flex justify-between border-t hairline pt-4 text-base font-medium">
-              <dt>Total</dt>
+              <dt>{t.cart.total}</dt>
               <dd>{formatPrice(total)}</dd>
             </div>
           </dl>
@@ -309,7 +302,7 @@ export function CheckoutClient() {
             disabled={placeOrder.isPending}
             className="mt-8 w-full"
           >
-            {placeOrder.isPending ? "Placing Order…" : `Place Order — ${formatPrice(total)}`}
+            {placeOrder.isPending ? t.checkout.placing : `${t.checkout.placeOrder} — ${formatPrice(total)}`}
           </Button>
           <p className="mt-4 text-center text-[0.625rem] font-light leading-relaxed text-muted">
             By placing this order you agree to our terms. This is a demo storefront — no payment is

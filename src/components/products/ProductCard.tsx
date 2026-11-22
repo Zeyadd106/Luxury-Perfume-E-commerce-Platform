@@ -7,21 +7,16 @@ import { useState } from "react";
 import type { Product } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { useCart, useToast, useUI, useWishlist } from "@/lib/store/store";
+import { useRequireAuth } from "@/lib/auth";
 import { Rating } from "@/components/ui/Rating";
 import { cn } from "@/lib/utils";
+import { useLang } from "@/lib/i18n/provider";
 
 const badgeStyles: Record<string, string> = {
   new: "bg-ivory text-ink",
   bestseller: "bg-ink text-ivory",
   limited: "bg-accent text-ink",
   sale: "bg-red-900 text-ivory",
-};
-
-const badgeLabels: Record<string, string> = {
-  new: "New",
-  bestseller: "Best Seller",
-  limited: "Limited",
-  sale: "Sale",
 };
 
 export function ProductCard({ product, priority = false, dark = false }: { product: Product; priority?: boolean; dark?: boolean }) {
@@ -31,6 +26,10 @@ export function ProductCard({ product, priority = false, dark = false }: { produ
   const { has, toggle } = useWishlist();
   const { push } = useToast();
   const { openQuickView } = useUI();
+  const requireAuth = useRequireAuth();
+  const { t } = useLang();
+  const badgeLabel = (b: string) =>
+    b === "new" ? t.shop.newArrival : b === "bestseller" ? t.shop.bestseller : b === "limited" ? t.shop.limited : t.shop.sale;
 
   const defaultSize = product.sizes.find((s) => s.inStock && s.ml === 50) ?? product.sizes.find((s) => s.inStock) ?? product.sizes[0];
   const wished = has(product.id);
@@ -39,6 +38,7 @@ export function ProductCard({ product, priority = false, dark = false }: { produ
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
+    if (!requireAuth(`add ${product.name} to your bag`)) return;
     addItem(
       {
         productId: product.id,
@@ -50,7 +50,7 @@ export function ProductCard({ product, priority = false, dark = false }: { produ
       },
       1
     );
-    push(`${product.name} added to your bag`);
+    push(t.product.addedToBag.replace("{name}", product.name));
     openCart();
   }
 
@@ -58,7 +58,7 @@ export function ProductCard({ product, priority = false, dark = false }: { produ
     e.preventDefault();
     e.stopPropagation();
     toggle({ productId: product.id, slug: product.slug, addedAt: new Date().toISOString() });
-    push(wished ? "Removed from wishlist" : "Saved to wishlist", "info");
+    push(wished ? t.product.wishlistRemoved : t.product.wishlistSaved, "info");
   }
 
   return (
@@ -98,7 +98,7 @@ export function ProductCard({ product, priority = false, dark = false }: { produ
               className="flex h-10 flex-1 items-center justify-center gap-2 bg-ivory/95 text-[0.6875rem] font-medium uppercase tracking-[0.2em] text-ink backdrop-blur transition-colors hover:bg-accent"
               aria-label={`Quick add ${product.name}`}
             >
-              <ShoppingBag size={14} /> Add to Bag
+              <ShoppingBag size={14} /> {t.product.addToBag}
             </button>
             <button
               onClick={(e) => {
@@ -109,24 +109,24 @@ export function ProductCard({ product, priority = false, dark = false }: { produ
               className="flex h-10 items-center justify-center border border-ivory/60 bg-ink/30 px-3 text-[0.6875rem] uppercase tracking-[0.2em] text-ivory backdrop-blur transition-colors hover:bg-ivory hover:text-ink"
               aria-label={`Quick view ${product.name}`}
             >
-              Quick View
+              {t.shop.quickView}
             </button>
           </div>
         </div>
       </Link>
 
       {product.badge && (
-        <span className={cn("absolute left-3 top-3 px-2.5 py-1 text-[0.625rem] font-medium uppercase tracking-[0.18em]", badgeStyles[product.badge])}>
-          {badgeLabels[product.badge]}
+        <span className={cn("absolute start-3 top-3 px-2.5 py-1 text-[0.625rem] font-medium uppercase tracking-[0.18em]", badgeStyles[product.badge])}>
+          {badgeLabel(product.badge)}
         </span>
       )}
       <button
         onClick={handleWishlist}
         className={cn(
-          "absolute right-3 top-3 flex h-9 w-9 items-center justify-center border backdrop-blur transition-all",
+          "absolute end-3 top-3 flex h-9 w-9 items-center justify-center border backdrop-blur transition-all",
           wished ? "border-accent bg-accent text-ink" : "border-ivory/40 bg-ink/20 text-ivory hover:bg-ivory hover:text-ink"
         )}
-        aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+        aria-label={wished ? t.product.wishlistRemoved : t.product.wishlistSaved}
         aria-pressed={wished}
       >
         <Heart size={14} fill={wished ? "currentColor" : "none"} />

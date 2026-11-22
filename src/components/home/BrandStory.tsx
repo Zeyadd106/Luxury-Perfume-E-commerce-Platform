@@ -1,9 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/animations/Reveal";
 import { brandConfig } from "@/config/brand.config";
+import { useLang } from "@/lib/i18n/provider";
 
 export function BrandStory() {
+  const { t } = useLang();
   return (
     <section className="bg-ivory py-20 sm:py-28">
       <Container>
@@ -27,37 +31,32 @@ export function BrandStory() {
 
           <div className="order-1 lg:order-2">
             <Reveal>
-              <p className="eyebrow mb-4 text-accent">Our Story</p>
+              <p className="eyebrow mb-4 text-accent">{t.home.storyEyebrow}</p>
               <h2 className="font-serif text-4xl font-light leading-[1.1] sm:text-5xl">
-                Perfume is memory,
+                {t.home.storyTitleA}
                 <br />
-                <span className="italic text-accent">made wearable.</span>
+                <span className="italic text-accent">{t.home.storyTitleB}</span>
               </h2>
             </Reveal>
             <Reveal delay={0.15}>
               <div className="mt-8 space-y-5 text-[0.95rem] font-light leading-[1.9] text-ink/70">
                 <p>
-                  Founded in {brandConfig.founded}, {brandConfig.name} began as a single-room atelier in
-                  Grasse with one conviction: that fine fragrance deserves the same patience and
-                  reverence as fine wine.
+                  {t.home.storyP1.replace("{founded}", String(brandConfig.founded)).replace("{name}", brandConfig.name)}
                 </p>
                 <p>
-                  Our master perfumers still macerate each composition for a minimum of six weeks,
-                  drawing on rare naturals — Grasse rose, Assam oud, Mysore sandalwood — sourced
-                  directly from the growers who cultivate them.
+                  {t.home.storyP2}
                 </p>
                 <p>
-                  Nothing leaves the atelier until it has been worn, lived with, and approved by the
-                  people who made it.
+                  {t.home.storyP3}
                 </p>
               </div>
             </Reveal>
             <Reveal delay={0.25}>
               <a
                 href="/our-story"
-                className="eyebrow mt-10 inline-block border-b border-accent pb-1 text-accent transition-colors hover:text-ink"
+                className="eyebrow mt-10 inline-block border-b border-accent pb-1 text-accent transition-colors hover:text-ivory"
               >
-                Read Our Story
+                {t.home.storyCta}
               </a>
             </Reveal>
           </div>

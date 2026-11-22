@@ -21,7 +21,7 @@ export function AnnouncementBar() {
   const item = announcementBar.items[index];
 
   return (
-    <div className="bg-ink text-ivory" role="region" aria-label="Announcements">
+    <div className="bg-accent text-ink" role="region" aria-label="Announcements">
       <div className="relative flex h-9 items-center justify-center overflow-hidden px-4">
         {announcementBar.items.map((a, i) => (
           <div
@@ -33,7 +33,7 @@ export function AnnouncementBar() {
             )}
           >
             {item.href ? (
-              <Link href={item.href} className="hover:text-accent transition-colors">
+              <Link href={item.href} className="hover:opacity-70 transition-opacity">
                 {a.message}
               </Link>
             ) : (

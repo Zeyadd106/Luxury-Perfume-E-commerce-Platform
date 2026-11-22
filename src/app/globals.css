@@ -4,10 +4,10 @@
    The root layout injects the live values from brandConfig as CSS vars,
    so changing the config re-skins the entire site without touching CSS. */
 :root {
-  --brand-ink: #15130f;
+  --brand-ink: #0c0c0c;
   --brand-ivory: #f4efe4;
-  --brand-accent: #c6a46c;
-  --brand-muted: #8f8674;
+  --brand-accent: #facc15;
+  --brand-muted: #a89f8d;
   --brand-line: #ddd3c0;
 }
 
@@ -26,10 +26,60 @@ html {
 }
 
 body {
-  background-color: var(--brand-ivory);
-  color: var(--brand-ink);
+  background-color: var(--brand-ink);
+  color: var(--brand-ivory);
   font-family: var(--font-jost), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   ZEIN dark theme — black surfaces, white text, yellow accents.
+   Ivory panels resolve to black; ink text resolves to off-white.
+   (Unlayered rules intentionally override the Tailwind utility layer.)
+   ========================================================================== */
+
+/* All ivory surfaces become black. */
+[class~="bg-ivory"],
+[class*="bg-ivory/"] {
+  background-color: #0c0c0c;
+}
+
+/* …except explicit hover states, which keep a light wash for feedback. */
+.hover\:bg-ivory\/5:hover,
+.hover\:bg-ivory\/10:hover {
+  background-color: rgb(244 239 228 / 0.1);
+}
+
+/* All ink-colored text becomes off-white (exact token + opacity variants).
+   hover:/group-hover: variants keep their own colors for hover states. */
+[class~="text-ink"],
+[class*="text-ink/"] {
+  color: #f2ede2;
+}
+
+/* Text sitting on solid yellow keeps a dark color for contrast. */
+[class~="bg-accent"] {
+  color: #0c0c0c;
+}
+
+/* Ink borders/dividers become light so they stay visible on black. */
+[class~="border-ink"] {
+  border-color: #f2ede2;
+}
+[class*="border-ink/"] {
+  border-color: rgb(242 237 226 / 0.35);
+}
+[class*="divide-ink"] > * + * {
+  border-color: rgb(242 237 226 / 0.12);
+}
+
+/* Status colors need light variants on dark backgrounds. */
+[class*="text-red-"] { color: #fca5a5; }
+[class*="text-blue-"] { color: #93c5fd; }
+[class*="text-green-"] { color: #86efac; }
+
+.hairline {
+  border-color: color-mix(in srgb, var(--brand-ivory) 16%, transparent);
 }
 
 ::selection {
@@ -45,12 +95,12 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--brand-ink) 25%, transparent);
+  background: color-mix(in srgb, var(--brand-ivory) 22%, transparent);
   border-radius: 8px;
-  border: 2px solid var(--brand-ivory);
+  border: 2px solid var(--brand-ink);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--brand-ink) 40%, transparent);
+  background: color-mix(in srgb, var(--brand-ivory) 38%, transparent);
 }
 
 /* Luxury utility classes */
